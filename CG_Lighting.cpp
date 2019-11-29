@@ -42,13 +42,13 @@ Particle** particles; //double pointer for an array
 float forces[NUM_P][3];
 Camera* cam;
 Camera* vfcCam;
-Camera* currentCam; 
+Camera* currentCam;
 
 
-GLfloat*    light0_position;    //<-------------------------------Light 0    - location array
-GLfloat*    light0_ambient;        //<-------------------------------Light 0    - ambient array
-GLfloat*    light0_specular;    //<-------------------------------Light 0    - diffuse array
-GLfloat*    light0_diffuse;        //<-------------------------------Light 0    - specular array
+GLfloat*    light0_position;    ///<-------------------------------Light 0    - location array
+GLfloat*    light0_ambient;        ///<-------------------------------Light 0    - ambient array
+GLfloat*    light0_specular;    ///<-------------------------------Light 0    - diffuse array
+GLfloat*    light0_diffuse;        ///<-------------------------------Light 0    - specular array
 
 
 float randBetween(float min, float max){
@@ -94,11 +94,11 @@ void init()
     //    float gForce[3] = {0, -9.81f * p->mass, 0};
     //    p -> addForce(gForce);
     //->LIGHT 0 BEGINS
-    light0_position = new GLfloat[4]; //<-------------------------Reserve memory
-    light0_position[0] = 1.0f; //<--------------------------------L0x
-    light0_position[1] = 1.0f; //<--------------------------------L0y
-    light0_position[2] = 1.0f; //<--------------------------------L0z
-    light0_position[3] = 0.0f; //<--------------------------------L0w
+    light0_position = new GLfloat[4]; ///<-------------------------Reserve memory
+    light0_position[0] = 1.0f; ///<--------------------------------L0x
+    light0_position[1] = 1.0f; ///<--------------------------------L0y
+    light0_position[2] = 1.0f; ///<--------------------------------L0z
+    light0_position[3] = 0.0f; ///<--------------------------------L0w
     
     /*
      Important: light position is L0(lx,ly,lz,lw).
@@ -106,25 +106,25 @@ void init()
      -If lw = 1, configures a point light, and parameters lx, ly y lz define its location.
      */
     
-    light0_ambient = new GLfloat[4]; //<--------------------------Reserve memory
-    light0_ambient[0] = 0.3f; //<---------------------------------Ia0r
-    light0_ambient[1] = 0.3f; //<---------------------------------Ia0g
-    light0_ambient[2] = 0.3f; //<---------------------------------Ia0b
-    light0_ambient[3] = 1.0f; //<---------------------------------Ia0a
+    light0_ambient = new GLfloat[4]; ///<--------------------------Reserve memory
+    light0_ambient[0] = 0.3f; ///<---------------------------------Ia0r
+    light0_ambient[1] = 0.3f; ///<---------------------------------Ia0g
+    light0_ambient[2] = 0.3f; ///<---------------------------------Ia0b
+    light0_ambient[3] = 1.0f; ///<---------------------------------Ia0a
     
-    light0_diffuse = new GLfloat[4]; //<--------------------------Reserve memory
-    light0_diffuse[0] = 1.0f; //<---------------------------------Id0r
-    light0_diffuse[1] = 1.0f; //<---------------------------------Id0g
-    light0_diffuse[2] = 1.0f; //<---------------------------------Id0b
-    light0_diffuse[3] = 1.0f; //<---------------------------------Id0a
+    light0_diffuse = new GLfloat[4]; ///<--------------------------Reserve memory
+    light0_diffuse[0] = 1.0f; ///<---------------------------------Id0r
+    light0_diffuse[1] = 1.0f; ///<---------------------------------Id0g
+    light0_diffuse[2] = 1.0f; ///<---------------------------------Id0b
+    light0_diffuse[3] = 1.0f; ///<---------------------------------Id0a
     
-    light0_specular = new GLfloat[4]; //<-------------------------Reserve memory
-    light0_specular[0] = 1.0f; //<--------------------------------Is0r
-    light0_specular[1] = 1.0f; //<--------------------------------Is0g
-    light0_specular[2] = 1.0f; //<--------------------------------Is0b
-    light0_specular[3] = 1.0f; //<--------------------------------Is0a
+    light0_specular = new GLfloat[4]; ///<-------------------------Reserve memory
+    light0_specular[0] = 1.0f; ///<--------------------------------Is0r
+    light0_specular[1] = 1.0f; ///<--------------------------------Is0g
+    light0_specular[2] = 1.0f; ///<--------------------------------Is0b
+    light0_specular[3] = 1.0f; ///<--------------------------------Is0a
     
-    //<-LIGHT 0 ENDS
+    ///<-LIGHT 0 ENDS
     
     // Locate LIGHT 0:
     glLightfv(GL_LIGHT0, GL_POSITION, light0_position);

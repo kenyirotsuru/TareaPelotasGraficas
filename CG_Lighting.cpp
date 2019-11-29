@@ -40,8 +40,8 @@
 int gravityOn = 0;
 Particle** particles; //double pointer for an array
 float forces[NUM_P][3];
-Camera* cam;
-Camera* vfcCam;
+Camera* testCam; //Camera that has the radar view
+Camera* mainCam; //Camera that has the VFC view
 Camera* currentCam;
 
 
@@ -255,11 +255,11 @@ void idle()                                                    // Called when dr
                         particles[p]->diffuse[0] = 1;
                         particles[p]->diffuse[1] = 0;
                         particles[p]->diffuse[2] = 0;
-                    } /*else{
+                    } else{
                         particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
                         particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
                         particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
-                    } */
+                    }
                 }
             }
         }
@@ -332,11 +332,11 @@ void idle()                                                    // Called when dr
                         particles[p]->diffuse[0] = 1;
                         particles[p]->diffuse[1] = 0;
                         particles[p]->diffuse[2] = 0;
-                    } /*else{
+                    } else{
                         particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
                         particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
                         particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
-                    } */
+                    } 
                 }
             }
         }

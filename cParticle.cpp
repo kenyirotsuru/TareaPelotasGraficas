@@ -1,4 +1,4 @@
-#include "cParticle.h"
+#include "cParticle.hpp"
 
 Particle::Particle()
 {

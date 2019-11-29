@@ -33,11 +33,13 @@
 #include <time.h>
 #include <cstdlib>
 
-#include "cParticle.h"
+#include "cParticle.hpp"
 #include "Camera.hpp"
 #define NUM_P 1000
+#define CUBE_SIZE 20
+#define FORCE_VALUE 0.5
 
-int gravityOn = 0;
+int gravityOn = 1;
 Particle** particles; //double pointer for an array
 float forces[NUM_P][3];
 Camera* testCam; //Camera that has the radar view
@@ -57,6 +59,20 @@ float randBetween(float min, float max){
 
 void init()
 {
+    testCam = new Camera();
+    mainCam = new Camera();
+    
+    testCam->setPos(0,30,40);
+    mainCam->setPos(0,0,0);
+    
+    testCam->setDirVec(0, -30, -40);
+    mainCam->setDirVec(0, 0, -1);
+    
+    testCam->setUpVec(0, 1, 0);
+    mainCam->setUpVec(0, 1, 0);
+    
+    currentCam = testCam;
+    
     particles = new Particle*[NUM_P]; //Instantiate
     for (int p = 0; p < NUM_P; p++) {
         particles[p] = new Particle();
@@ -84,9 +100,9 @@ void init()
         particles[p] -> oDiffuse[1] = particles[p] -> diffuse[1];
         particles[p] -> oDiffuse[2] = particles[p] -> diffuse[2];
         
-        forces[p][0] = randBetween(-2, 2);
-        forces[p][1] = randBetween(-2, 2);
-        forces[p][2] = randBetween(-2, 2);
+        forces[p][0] = randBetween(-FORCE_VALUE, FORCE_VALUE);
+        forces[p][1] = randBetween(-FORCE_VALUE, FORCE_VALUE);
+        forces[p][2] = randBetween(-FORCE_VALUE, FORCE_VALUE);
         particles[p] -> addForce(forces[p]);
         
         particles[p] -> specular[0] = randBetween(0.4, 0.8);
@@ -171,15 +187,19 @@ void display()                                                    // Called for 
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                            // Clear color and depth buffers.
     glLoadIdentity();                                            // Reset 3D view matrix.
+    /*
     gluLookAt(0.0, 0.0, -40.0,                                        // Where the camera is.
               0.0, 0.0, 0.0,                                        // To where the camera points at.
               0.0, 1.0, 0.0);                                        // "UP" vector.
+     */
+    currentCam->setView();
     
-    glutWireCube(20);
+    glutWireCube(CUBE_SIZE);
     axes(1);
     for (int p = 0; p < NUM_P; p++) {
         particles[p] -> draw();
     }
+    
     glutSwapBuffers();                                            // Swap the hidden and visible buffers.
 }
 
@@ -189,55 +209,42 @@ void idle()                                                    // Called when dr
         for (int p = 0; p < NUM_P; p++) {
             float gForce[3] = {0, -9.81f * particles[p]->mass, 0};
             
-            if (particles[p]->pos[1] <= -10) {
+            if (particles[p]->pos[1] <= -(CUBE_SIZE / 2)) {
                 particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
-                particles[p]->pos[1] = -10;
+                particles[p]->pos[1] = -(CUBE_SIZE / 2);
                 //gravityOn = 0;
-                
-                printf("Tocó el piso\n");
             }else{
                 // right
-                if (particles[p]->pos[0] >= 10) {
+                if (particles[p]->pos[0] >= (CUBE_SIZE / 2)) {
                     particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
-                    particles[p]->pos[0] = 10;
+                    particles[p]->pos[0] = (CUBE_SIZE / 2);
                     //gravityOn = 0;
-                    
-                    printf("Tocó la pared derecha\n");
                 }else{
                     // back
-                    if (particles[p]->pos[2] <= -10) {
+                    if (particles[p]->pos[2] <= -(CUBE_SIZE / 2)) {
                         particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
-                        particles[p]->pos[2] = -10;
+                        particles[p]->pos[2] = -(CUBE_SIZE / 2);
                         //gravityOn = 0;
-                        
-                        printf("Tocó la pared trasera\n");
                     }else{
                         // left
-                        if (particles[p]->pos[0] <= -10) {
+                        if (particles[p]->pos[0] <= -(CUBE_SIZE / 2)) {
                             particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
-                            particles[p]->pos[0] = -10;
+                            particles[p]->pos[0] = -(CUBE_SIZE / 2);
                             //gravityOn = 0;
-                            
-                            printf("Tocó la pared izquierda\n");
                         }else{
                             // front
-                            if (particles[p]->pos[2] >= 10) {
+                            if (particles[p]->pos[2] >= (CUBE_SIZE / 2)) {
                                 particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
-                                particles[p]->pos[2] = 10;
+                                particles[p]->pos[2] = (CUBE_SIZE / 2);
                                 //gravityOn = 0;
-                                
-                                printf("Tocó la pared frontal\n");
                             }else{
                                 // top
-                                if (particles[p]->pos[1] >= 10) {
+                                if (particles[p]->pos[1] >= (CUBE_SIZE / 2)) {
                                     particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
-                                    particles[p]->pos[1] = 10;
+                                    particles[p]->pos[1] = (CUBE_SIZE / 2);
                                     //gravityOn = 0;
-                                    
-                                    printf("Tocó el techo\n");
                                 }else{
                                     particles[p] -> addForce(gForce);
-                                    printf("Ningún if\n");
                                 }
                             }
                         }
@@ -246,75 +253,46 @@ void idle()                                                    // Called when dr
             }
             particles[p] -> stepSimulation(1/60.0f);
             
-        }
-        for (int p = 0; p < NUM_P; p++) {
-            for (int k = 0; k < NUM_P; k++) {
-                if (k != p) {
-                    bool check = particles[p]->inCollision(particles[k]);
-                    if (check == true) {
-                        particles[p]->diffuse[0] = 1;
-                        particles[p]->diffuse[1] = 0;
-                        particles[p]->diffuse[2] = 0;
-                    } else{
-                        particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
-                        particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
-                        particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
-                    }
-                }
-            }
         }
     }else{
         for (int p = 0; p < NUM_P; p++) {
             // floor
-            if (particles[p]->pos[1] <= -10) {
+            if (particles[p]->pos[1] <= -(CUBE_SIZE / 2)) {
                 particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
-                particles[p]->pos[1] = -10;
+                particles[p]->pos[1] = -(CUBE_SIZE / 2);
                 gravityOn = 1;
-                
-                printf("Tocó el piso\n");
             }else{
                 // right
-                if (particles[p]->pos[0] >= 10) {
+                if (particles[p]->pos[0] >= (CUBE_SIZE / 2)) {
                     particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
-                    particles[p]->pos[0] = 10;
+                    particles[p]->pos[0] = (CUBE_SIZE / 2);
                     gravityOn = 1;
-                    
-                    printf("Tocó la pared derecha\n");
                 }else{
                     // back
-                    if (particles[p]->pos[2] <= -10) {
+                    if (particles[p]->pos[2] <= -(CUBE_SIZE / 2)) {
                         particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
-                        particles[p]->pos[2] = -10;
+                        particles[p]->pos[2] = -(CUBE_SIZE / 2);
                         gravityOn = 1;
-                        
-                        printf("Tocó la pared trasera\n");
                     }else{
                         // left
-                        if (particles[p]->pos[0] <= -10) {
+                        if (particles[p]->pos[0] <= -(CUBE_SIZE / 2)) {
                             particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
-                            particles[p]->pos[0] = -10;
+                            particles[p]->pos[0] = -(CUBE_SIZE / 2);
                             gravityOn = 1;
-                            
-                            printf("Tocó la pared izquierda\n");
                         }else{
                             // front
-                            if (particles[p]->pos[2] >= 10) {
+                            if (particles[p]->pos[2] >= (CUBE_SIZE / 2)) {
                                 particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
-                                particles[p]->pos[2] = 10;
+                                particles[p]->pos[2] = (CUBE_SIZE / 2);
                                 gravityOn = 1;
-                                
-                                printf("Tocó la pared frontal\n");
                             }else{
                                 // top
-                                if (particles[p]->pos[1] >= 10) {
+                                if (particles[p]->pos[1] >= (CUBE_SIZE / 2)) {
                                     particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
-                                    particles[p]->pos[1] = 10;
+                                    particles[p]->pos[1] = (CUBE_SIZE / 2);
                                     gravityOn = 1;
-                                    
-                                    printf("Tocó el techo\n");
                                 }else{
                                     particles[p] -> addForce(forces[p]);
-                                    printf("Ningún if\n");
                                 }
                             }
                         }
@@ -324,19 +302,20 @@ void idle()                                                    // Called when dr
             
             particles[p] -> stepSimulation(1/60.0f);
         }
-        for (int p = 0; p < NUM_P; p++) {
-            for (int k = 0; k < NUM_P; k++) {
-                if (k != p) {
-                    bool check = particles[p]->inCollision(particles[k]);
-                    if (check == true) {
-                        particles[p]->diffuse[0] = 1;
-                        particles[p]->diffuse[1] = 0;
-                        particles[p]->diffuse[2] = 0;
-                    } else{
-                        particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
-                        particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
-                        particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
-                    } 
+    }
+    
+    for (int p = 0; p < NUM_P; p++) {
+        for (int k = 0; k < NUM_P; k++) {
+            if (k != p) {
+                bool check = particles[p]->inCollision(particles[k]);
+                if (check == true) {
+                    particles[p]->diffuse[0] = 1;
+                    particles[p]->diffuse[1] = 0;
+                    particles[p]->diffuse[2] = 0;
+                } else{
+                    particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
+                    particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
+                    particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
                 }
             }
         }
@@ -352,17 +331,34 @@ void reshape(int x, int y)                                            // Called 
 {
     glMatrixMode(GL_PROJECTION);                                        // Go to 2D mode.
     glLoadIdentity();                                            // Reset the 2D matrix.
-    gluPerspective(40.0, (GLdouble)x / (GLdouble)y, 0.1, 200.0);                        // Configure the camera lens aperture.
+    gluPerspective(60.0, (GLdouble)x / (GLdouble)y, 0.1, 200.0);                        // Configure the camera lens aperture.
     glMatrixMode(GL_MODELVIEW);                                        // Go to 3D mode.
     glViewport(0, 0, x, y);                                            // Configure the camera frame dimensions.
+    /*
     gluLookAt(0.0, 0.0, -40.0,                                        // Where the camera is.
               0.0, 0.0, 0.0,                                        // To where the camera points at.
               0.0, 1.0, 0.0);                                        // "UP" vector.
+     */
+    currentCam->setView();
     display();
 }
 
 void keyboard(unsigned char key, int x, int y)
 {
+    switch(key){
+        case 'a':
+            currentCam->rotate(5, 0, 1, 0);
+            break;
+        case 'd':
+            currentCam->rotate(-5, 0, 1, 0);
+            break;
+        case 'n':
+            currentCam = mainCam;
+            break;
+        case 'm':
+            currentCam = testCam;
+            break;
+    }
 }
 
 int main(int argc, char* argv[])

@@ -35,7 +35,7 @@
 
 #include "cParticle.h"
 #include "Camera.hpp"
-#define NUM_P 50
+#define NUM_P 1000
 
 int gravityOn = 0;
 Particle** particles; //double pointer for an array
@@ -72,13 +72,13 @@ void init()
         particles[p] -> oldPos[1] = particles[p] -> pos[1];
         particles[p] -> oldPos[2] = particles[p] -> pos[2];
         
-        particles[p] -> mass = randBetween(5,15);
+        particles[p] -> mass = randBetween(1,2);
         particles[p] -> radius = particles[p] -> mass / 10.0f;
         particles[p] -> area = 4.0f * M_PI * particles[p] -> radius * particles[p] -> radius;
         
-        particles[p] -> diffuse[0] = randBetween(0, 1);
-        particles[p] -> diffuse[1] = randBetween(0, 1);
-        particles[p] -> diffuse[2] = randBetween(0, 1);
+        particles[p] -> diffuse[0] = randBetween(0.2, 0.8);
+        particles[p] -> diffuse[1] = randBetween(0.2, 1);
+        particles[p] -> diffuse[2] = randBetween(0.2, 1);
         
         particles[p] -> oDiffuse[0] = particles[p] -> diffuse[0];
         particles[p] -> oDiffuse[1] = particles[p] -> diffuse[1];
@@ -88,6 +88,10 @@ void init()
         forces[p][1] = randBetween(-2, 2);
         forces[p][2] = randBetween(-2, 2);
         particles[p] -> addForce(forces[p]);
+        
+        particles[p] -> specular[0] = randBetween(0.4, 0.8);
+        particles[p] -> specular[1] = randBetween(0.4, 0.8);
+        particles[p] -> specular[2] = randBetween(0.4, 0.8);
     }
     //    p->pos[1] = 10;
     //    p -> oldPos[1] = 10;
@@ -251,11 +255,11 @@ void idle()                                                    // Called when dr
                         particles[p]->diffuse[0] = 1;
                         particles[p]->diffuse[1] = 0;
                         particles[p]->diffuse[2] = 0;
-                    } /* else{
+                    } /*else{
                         particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
                         particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
                         particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
-                    }*/ 
+                    } */
                 }
             }
         }
@@ -332,7 +336,7 @@ void idle()                                                    // Called when dr
                         particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
                         particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
                         particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
-                    }*/
+                    } */
                 }
             }
         }

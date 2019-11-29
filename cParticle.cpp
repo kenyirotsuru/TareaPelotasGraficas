@@ -16,7 +16,7 @@ Particle::Particle()
     forces[0] = forces[1] = forces[2] = 0;
     dragForce[0] = dragForce[1] = dragForce[2] = 0;
     specular[0] = specular[1] = specular[2] = 0;
-    shininess = 60;
+    shininess = 100;
     radius = mass / 10;
     age = 0;
     restitutionCoefficient = 0.7f; //Elastic with the floor, how much it bounces with the floor

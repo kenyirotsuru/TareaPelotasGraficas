@@ -42,7 +42,7 @@ Particle** particles; //double pointer for an array
 float forces[NUM_P][3];
 Camera* cam;
 Camera* vfcCam;
-Camera* currentCam;
+Camera* currentCam; 
 
 
 GLfloat*    light0_position;    //<-------------------------------Light 0    - location array

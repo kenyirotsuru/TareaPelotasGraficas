@@ -251,7 +251,11 @@ void idle()                                                    // Called when dr
                         particles[p]->diffuse[0] = 1;
                         particles[p]->diffuse[1] = 0;
                         particles[p]->diffuse[2] = 0;
-                    }
+                    } /* else{
+                        particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
+                        particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
+                        particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
+                    }*/ 
                 }
             }
         }
@@ -324,7 +328,11 @@ void idle()                                                    // Called when dr
                         particles[p]->diffuse[0] = 1;
                         particles[p]->diffuse[1] = 0;
                         particles[p]->diffuse[2] = 0;
-                    }
+                    } /*else{
+                        particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
+                        particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
+                        particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
+                    }*/
                 }
             }
         }

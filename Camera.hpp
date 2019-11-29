@@ -1,3 +1,4 @@
+#define GL_SILENCE_DEPRECATION
 #ifdef __APPLE__
     #include <OpenGL/gl.h>
     #include <OpenGL/glu.h>
@@ -79,6 +80,8 @@ public:
     float modelviewMatrix[16];
     //    float modelviewProjectionMatrix[16];
     char name[32];
+    
+    bool pointInFrustrum(float *p);
 };
 
 #endif

@@ -14,6 +14,23 @@ Camera::Camera(){
     fov = 45;
     tang = (float)tan(GRAD2RAD * fov * 0.5) ;
     
+    Z[0] = dir[0];
+    Z[1] = dir[1];
+    Z[2] = dir[2];
+    
+    normalize(Z);
+    normalize(up);
+    
+    X[0] = Z[1]*up[2] - Z[2]*up[1];
+    X[1] = Z[2]*up[0] - Z[0]*up[2];
+    X[2] = Z[0]*up[1] - Z[1]*up[0];
+    normalize(X);
+    
+    Y[0] = X[1]*Z[2] - X[2]*Z[1];
+    Y[1] = X[2]*Z[0] - X[0]*Z[2];
+    Y[2] = X[0]*Z[1] - X[1]*Z[0];
+    normalize(Y);
+    
 }
 
 void Camera::init(){
@@ -381,13 +398,48 @@ void Camera::normalize(float *p)
     
     len = sqrt (p[0]*p[0] + p[1]*p[1] + p[2]*p[2]);
     if (len > 0.0){
-        p[0] /= len,
-        p[1] /= len,
+        p[0] /= len;
+        p[1] /= len;
         p[2] /= len;
     }
     else {
-        p[0] = 0,
-        p[1] = 0,
+        p[0] = 0;
+        p[1] = 0;
         p[2] = 0;
     }
+}
+
+bool Camera::pointInFrustrum(float* p) {
+        
+    glGetIntegerv(GL_VIEWPORT, viewportDims);
+    
+    ratio = (float)viewportDims[2] / (float) viewportDims[3];
+    
+    float tang = 2 * tan(fov / 2);
+    float height = near_plane * tang;
+    float Wnear = height * ratio;
+    float vx = p[0]-pos[0];
+    float vy = p[1]-pos[1];
+    float vz = p[2]-pos[2];
+    
+    float pcz, pcx, pcy;
+    
+    pcz = vx*Z[0] + vy*Z[1] + vz*Z[2];
+    if (pcz > far_plane || pcz < near_plane) {
+        return false;
+    }
+    
+    pcy = vx*Y[0] + vy*Y[1] + vz*Y[2];
+    float aux = pcz * tang;
+    if (pcy > aux || pcy < -aux) {
+        return false;
+    }
+    
+    pcx = vx*X[0] + vy*X[1] + vz*X[2];
+    aux = aux * ratio;
+    if (pcx > aux || pcx < -aux) {
+        return false;
+    }
+    
+    return true;
 }

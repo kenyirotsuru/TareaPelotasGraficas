@@ -207,7 +207,11 @@ void display()                                                    // Called for 
     glutWireCube(CUBE_SIZE);
     axes(1);
     for (int p = 0; p < NUM_P; p++) {
-        particles[p] -> draw();
+        if (currentCam->pointInFrustrum(particles[p]->pos)) {
+            particles[p] -> draw();
+
+        }
+        //particles[p] -> draw();
     }
     
     glutSwapBuffers();                                            // Swap the hidden and visible buffers.
@@ -317,11 +321,11 @@ void idle()                                                    // Called when dr
                     particles[p]->diffuse[0] = 1;
                     particles[p]->diffuse[1] = 0;
                     particles[p]->diffuse[2] = 0;
-                } /*else{
+                } else{
                     particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
                     particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
                     particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
-                }*/
+                }
             }
         }
     }

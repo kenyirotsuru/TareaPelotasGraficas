@@ -81,7 +81,7 @@ public:
     //    float modelviewProjectionMatrix[16];
     char name[32];
     
-    //bool pointInFrustrum(float *p);
+    bool pointInFrustrum(float *p);
 };
 
 #endif

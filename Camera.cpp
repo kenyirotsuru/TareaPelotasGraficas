@@ -408,17 +408,101 @@ void Camera::normalize(float *p)
         p[2] = 0;
     }
 }
+
+float dotProd( const vector3f &v1,  const vector3f &v2 )
+{
+    return( v1.x * v2.x + v1.y * v2.y + v1.z * v2.z  );
+}
+
+vector3f crossProd( const vector3f &v1,  const vector3f &v2 )
+{
+    vector3f vCrossProduct;
+    
+    vCrossProduct.x = v1.y * v2.z - v1.z * v2.y;
+    vCrossProduct.y = v1.z * v2.x - v1.x * v2.z;
+    vCrossProduct.z = v1.x * v2.y - v1.y * v2.x;
+    
+    return vCrossProduct;
+}
 /*
 bool Camera::pointInFrustrum(float* p) {
+    vector3f z;
+    vector3f y;
+    vector3f x;
     
-    float viewportDims[2] = {800,800};
+    z.x = dir[0];
+    z.y = dir[1];
+    z.z = dir[2];
+    
+    y.x = up[0];
+    y.y = up[1];
+    y.z = up[2];
+    
+    x = crossProd(z,y);
+    
+    vector3f v;
+    
+    v.x = p[0]-pos[0];
+    v.y = p[1]-pos[1];
+    v.z = p[2]-pos[2];
+    
+    float tang = 2 * tan(fov / 2);
+    
+    float proyection1 = dotProd(v, z);
+    
+    //printf("proyection1 = %f\n",proyection1);
+    
+    if(proyection1 < near_plane || proyection1 > far_plane){
+        return false;
+    }
+    
+    float proyection2 = dotProd(v, y);
+    
+    //printf("proyection2 = %f\n",proyection2);
+    
+    float height = near_plane * tang;
+    
+    if(proyection2 < -(height/2) || proyection2 > (height/2)){
+        return false;
+    }
+    
+    float proyection3 = dotProd(v, x);
+    
+    //printf("proyection3 = %f\n",proyection3);
+    
+    float width = height / tang;
+    
+    if(proyection3 < -(width/2) || proyection3 > (width/2)){
+        return false;
+    }
+    
+    return true;
+}
+ */
+
+bool Camera::pointInFrustrum(float* p) {
+    int viewportDims[4];
         
     glGetIntegerv(GL_VIEWPORT, viewportDims);
     
     ratio = (float)viewportDims[2] / (float) viewportDims[3];
     
+    vector3f z;
+    vector3f y;
+    vector3f x;
+    
+    z.x = dir[0];
+    z.y = dir[1];
+    z.z = dir[2];
+    
+    y.x = up[0];
+    y.y = up[1];
+    y.z = up[2];
+    
+    x = crossProd(z,y);
+    
     float tang = 2 * tan(fov / 2);
-    float height = near_plane * tang;
+    float height = far_plane * tang;
     float Wnear = height * ratio;
     float vx = p[0]-pos[0];
     float vy = p[1]-pos[1];
@@ -426,23 +510,26 @@ bool Camera::pointInFrustrum(float* p) {
     
     float pcz, pcx, pcy;
     
-    pcz = vx*Z[0] + vy*Z[1] + vz*Z[2];
+    pcz = vx*dir[0] + vy*dir[1] + vz*dir[2];
     if (pcz > far_plane || pcz < near_plane) {
+        printf("En la primera\n");
         return false;
     }
     
-    pcy = vx*Y[0] + vy*Y[1] + vz*Y[2];
+    pcy = vx*up[0] + vy*up[1] + vz*up[2];
     float aux = pcz * tang;
     if (pcy > aux || pcy < -aux) {
+        printf("En la segunda\n");
         return false;
     }
     
-    pcx = vx*X[0] + vy*X[1] + vz*X[2];
+    pcx = vx*x.x + vy*x.y + vz*x.z;
     aux = aux * ratio;
     if (pcx > aux || pcx < -aux) {
+        printf("En la tercera\n");
         return false;
     }
     
     return true;
 }
-*/
+

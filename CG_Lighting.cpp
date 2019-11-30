@@ -46,6 +46,7 @@ Camera* testCam; //Camera that has the radar view
 Camera* mainCam; //Camera that has the VFC view
 Camera* currentCam;
 
+bool mainCamIsCurrent = false;
 
 GLfloat*    light0_position;    ///<-------------------------------Light 0    - location array
 GLfloat*    light0_ambient;        ///<-------------------------------Light 0    - ambient array
@@ -202,19 +203,25 @@ void display()                                                    // Called for 
               0.0, 0.0, 0.0,                                        // To where the camera points at.
               0.0, 1.0, 0.0);                                        // "UP" vector.
      */
-    currentCam->setView();
+    if(mainCamIsCurrent){
+        mainCam->draw();
+        mainCam->setView();
+    }else{
+        testCam->draw();
+        testCam->setView();
+    }
+    mainCam->draw();
     
     glutWireCube(CUBE_SIZE);
     axes(1);
     
     for (int p = 0; p < NUM_P; p++) {
-        /*
-        if (currentCam->pointInFrustrum(particles[p]->pos)) {
+        
+        if (mainCam->pointInFrustrum(particles[p]->pos)) {
             particles[p] -> draw();
-
+            //printf("In the cube\n");
         }
-         */
-        particles[p] -> draw();
+        //particles[p] -> draw();
     }
     
     glutSwapBuffers();                                            // Swap the hidden and visible buffers.
@@ -377,22 +384,24 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch(key){
         case 'w':
-            currentCam->rotate(5, 1, 0, 0);
+            mainCam->rotate(5, 1, 0, 0);
             break;
         case 'a':
-            currentCam->rotate(5, 0, 1, 0);
+            mainCam->rotate(5, 0, 1, 0);
             break;
         case 's':
-            currentCam->rotate(-5, 1, 0, 0);
+            mainCam->rotate(-5, 1, 0, 0);
             break;
         case 'd':
-            currentCam->rotate(-5, 0, 1, 0);
+            mainCam->rotate(-5, 0, 1, 0);
             break;
         case 'n':
             currentCam = mainCam;
+            mainCamIsCurrent = true;
             break;
         case 'm':
             currentCam = testCam;
+            mainCamIsCurrent = false;
             break;
     }
 }

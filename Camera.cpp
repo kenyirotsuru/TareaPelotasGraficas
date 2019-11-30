@@ -408,8 +408,10 @@ void Camera::normalize(float *p)
         p[2] = 0;
     }
 }
-
+/*
 bool Camera::pointInFrustrum(float* p) {
+    
+    float viewportDims[2] = {800,800};
         
     glGetIntegerv(GL_VIEWPORT, viewportDims);
     
@@ -443,3 +445,4 @@ bool Camera::pointInFrustrum(float* p) {
     
     return true;
 }
+*/

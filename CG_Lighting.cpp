@@ -37,7 +37,7 @@
 #include "Camera.hpp"
 #define NUM_P 1000
 #define CUBE_SIZE 20
-#define FORCE_VALUE 0.5
+#define FORCE_VALUE 2
 
 int gravityOn = 1;
 Particle** particles; //double pointer for an array
@@ -83,9 +83,9 @@ void init()
     for (int p = 0; p < NUM_P; p++) {
         particles[p] = new Particle();
         
-         particles[p]->pos[0] = randBetween(-10, 10);
-         particles[p]->pos[1] = randBetween(-10, 10);
-         particles[p]->pos[2] = randBetween(-10, 10);
+         particles[p]->pos[0] = randBetween(-(CUBE_SIZE / 4), (CUBE_SIZE / 4));
+         particles[p]->pos[1] = randBetween(-(CUBE_SIZE / 4), (CUBE_SIZE / 4));
+         particles[p]->pos[2] = randBetween(-(CUBE_SIZE / 4), (CUBE_SIZE / 4));
         
         
         //particles[p]->pos[0] = particles[p]->pos[1] = particles[p]->pos[2] = 0;
@@ -206,12 +206,15 @@ void display()                                                    // Called for 
     
     glutWireCube(CUBE_SIZE);
     axes(1);
+    
     for (int p = 0; p < NUM_P; p++) {
+        /*
         if (currentCam->pointInFrustrum(particles[p]->pos)) {
             particles[p] -> draw();
 
         }
-        //particles[p] -> draw();
+         */
+        particles[p] -> draw();
     }
     
     glutSwapBuffers();                                            // Swap the hidden and visible buffers.
@@ -224,89 +227,83 @@ void idle()                                                    // Called when dr
             float gForce[3] = {0, -9.81f * particles[p]->mass, 0};
             
             if (particles[p]->pos[1] <= -(CUBE_SIZE / 2)) {
-                particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
+                particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;;
                 particles[p]->pos[1] = -(CUBE_SIZE / 2);
-            }else{
-                // right
-                if (particles[p]->pos[0] >= (CUBE_SIZE / 2)) {
-                    particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
-                    particles[p]->pos[0] = (CUBE_SIZE / 2);
-                }else{
-                    // back
-                    if (particles[p]->pos[2] <= -(CUBE_SIZE / 2)) {
-                        particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
-                        particles[p]->pos[2] = -(CUBE_SIZE / 2);
-                    }else{
-                        // left
-                        if (particles[p]->pos[0] <= -(CUBE_SIZE / 2)) {
-                            particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
-                            particles[p]->pos[0] = -(CUBE_SIZE / 2);
-                        }else{
-                            // front
-                            if (particles[p]->pos[2] >= (CUBE_SIZE / 2)) {
-                                particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
-                                particles[p]->pos[2] = (CUBE_SIZE / 2);
-                            }else{
-                                // top
-                                if (particles[p]->pos[1] >= (CUBE_SIZE / 2)) {
-                                    particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
-                                    particles[p]->pos[1] = (CUBE_SIZE / 2);
-                                }else{
-                                    particles[p]->forces[1] = gForce[1];
-                                    particles[p] -> addForce(gForce);
-                                }
-                            }
-                        }
-                    }
-                }
             }
+            if (particles[p]->pos[0] >= (CUBE_SIZE / 2)) {
+                particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
+                particles[p]->forces[1] = gForce[1];
+                particles[p]->pos[0] = (CUBE_SIZE / 2);
+            }
+            if (particles[p]->pos[2] <= -(CUBE_SIZE / 2)) {
+                particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
+                particles[p]->forces[1] = gForce[1];
+                particles[p]->pos[2] = -(CUBE_SIZE / 2);
+            }
+            if (particles[p]->pos[0] <= -(CUBE_SIZE / 2)) {
+                particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
+                particles[p]->forces[1] = gForce[1];
+                particles[p]->pos[0] = -(CUBE_SIZE / 2);
+            }
+            if (particles[p]->pos[2] >= (CUBE_SIZE / 2)) {
+                particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
+                particles[p]->forces[1] = gForce[1];
+                particles[p]->pos[2] = (CUBE_SIZE / 2);
+            }
+            if (particles[p]->pos[1] >= (CUBE_SIZE / 2)) {
+                particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
+                particles[p]->pos[1] = (CUBE_SIZE / 2);
+            }
+            
+            particles[p]->forces[1] = gForce[1];
+            particles[p]->addForce(gForce);
+            
             particles[p] -> stepSimulation(1/60.0f);
             
         }
     }else{
         for (int p = 0; p < NUM_P; p++) {
+            bool outside = false;
             // floor
             if (particles[p]->pos[1] <= -(CUBE_SIZE / 2)) {
                 particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
                 particles[p]->pos[1] = -(CUBE_SIZE / 2);
                 gravityOn = 1;
-            }else{
-                // right
-                if (particles[p]->pos[0] >= (CUBE_SIZE / 2)) {
-                    particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
-                    particles[p]->pos[0] = (CUBE_SIZE / 2);
-                    gravityOn = 1;
-                }else{
-                    // back
-                    if (particles[p]->pos[2] <= -(CUBE_SIZE / 2)) {
-                        particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
-                        particles[p]->pos[2] = -(CUBE_SIZE / 2);
-                        gravityOn = 1;
-                    }else{
-                        // left
-                        if (particles[p]->pos[0] <= -(CUBE_SIZE / 2)) {
-                            particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
-                            particles[p]->pos[0] = -(CUBE_SIZE / 2);
-                            gravityOn = 1;
-                        }else{
-                            // front
-                            if (particles[p]->pos[2] >= (CUBE_SIZE / 2)) {
-                                particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
-                                particles[p]->pos[2] = (CUBE_SIZE / 2);
-                                gravityOn = 1;
-                            }else{
-                                // top
-                                if (particles[p]->pos[1] >= (CUBE_SIZE / 2)) {
-                                    particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
-                                    particles[p]->pos[1] = (CUBE_SIZE / 2);
-                                    gravityOn = 1;
-                                }else{
-                                    particles[p] -> addForce(forces[p]);
-                                }
-                            }
-                        }
-                    }
-                }
+                outside = true;
+            }
+            if (particles[p]->pos[0] >= (CUBE_SIZE / 2)) {
+                particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
+                particles[p]->pos[0] = (CUBE_SIZE / 2);
+                gravityOn = 1;
+                outside = true;
+            }
+            if (particles[p]->pos[2] <= -(CUBE_SIZE / 2)) {
+                particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
+                particles[p]->pos[2] = -(CUBE_SIZE / 2);
+                gravityOn = 1;
+                outside = true;
+            }
+            if (particles[p]->pos[0] <= -(CUBE_SIZE / 2)) {
+                particles[p]->forces[0] = -particles[p]->forces[0] * particles[p]->restitutionCoefficient;
+                particles[p]->pos[0] = -(CUBE_SIZE / 2);
+                gravityOn = 1;
+                outside = true;
+            }
+            if (particles[p]->pos[2] >= (CUBE_SIZE / 2)) {
+                particles[p]->forces[2] = -particles[p]->forces[2] * particles[p]->restitutionCoefficient;
+                particles[p]->pos[2] = (CUBE_SIZE / 2);
+                gravityOn = 1;
+                outside = true;
+            }
+            if (particles[p]->pos[1] >= (CUBE_SIZE / 2)) {
+                particles[p]->forces[1] = -particles[p]->forces[1] * particles[p]->restitutionCoefficient;
+                particles[p]->pos[1] = (CUBE_SIZE / 2);
+                gravityOn = 1;
+                outside = true;
+            }
+            
+            if (!outside){
+                particles[p] -> addForce(forces[p]);
             }
             
             particles[p] -> stepSimulation(1/60.0f);
@@ -321,18 +318,42 @@ void idle()                                                    // Called when dr
                     particles[p]->diffuse[0] = 1;
                     particles[p]->diffuse[1] = 0;
                     particles[p]->diffuse[2] = 0;
-                } else{
+                } /*else{
                     particles[p]->diffuse[0] = particles[p]->oDiffuse[0];
                     particles[p]->diffuse[1] = particles[p]->oDiffuse[1];
                     particles[p]->diffuse[2] = particles[p]->oDiffuse[2];
-                }
+                }*/
             }
         }
     }
     
-    //    float gForce[3] = {0, -9.81f * p->mass, 0};
-    //    p -> addForce(gForce);
-    //    p -> stepSimulation(1/60.0f);
+    float stopFactor = FORCE_VALUE / 20;
+    
+    for (int p = 0; p < NUM_P; p++) {
+        float stopX = 0;
+        float stopZ = 0;
+        
+        if(particles[p]->forces[0] > 0){
+            stopX = -stopFactor;
+        }else{
+            if(particles[p]->forces[0] < 0){
+                stopX = stopFactor;
+            }
+        }
+        
+        if(particles[p]->forces[2] > 0){
+            stopZ = -stopFactor;
+        }else{
+            if(particles[p]->forces[2] < 0){
+                stopZ = stopFactor;
+            }
+        }
+        
+        float gForce = -150.0f * particles[p]->mass;
+        float stopForce[3] = {stopX, gForce, stopZ};
+        particles[p] -> addForce(stopForce);
+        particles[p] -> stepSimulation(1/60.0f);
+    }
     glutPostRedisplay();                                            // Display again.
 }
 

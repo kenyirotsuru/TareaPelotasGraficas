@@ -47,7 +47,7 @@ void Particle::addForce(float *force){
 }
 
 void Particle::integrateVerlet(float dt){
-    float rho = 100.0f;
+    float rho = 150.0f;
     float dist[3] = {abs(pos[0] - oldPos[0]), abs(pos[1] - oldPos[1]),abs(pos[2] - oldPos[2])};
     float v[3] = {dist[0]/dt, dist[1]/dt, dist[2]/dt};
     float v2[3] = {v[0] * v[0], v[1] * v[1], v[2] * v[2]};

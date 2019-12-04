@@ -424,62 +424,133 @@ vector3f crossProd( const vector3f &v1,  const vector3f &v2 )
     
     return vCrossProduct;
 }
-/*
-bool Camera::pointInFrustrum(float* p) {
-    vector3f z;
-    vector3f y;
-    vector3f x;
-    
-    z.x = dir[0];
-    z.y = dir[1];
-    z.z = dir[2];
-    
-    y.x = up[0];
-    y.y = up[1];
-    y.z = up[2];
-    
-    x = crossProd(z,y);
-    
-    vector3f v;
-    
-    v.x = p[0]-pos[0];
-    v.y = p[1]-pos[1];
-    v.z = p[2]-pos[2];
-    
-    float tang = 2 * tan(fov / 2);
-    
-    float proyection1 = dotProd(v, z);
-    
-    //printf("proyection1 = %f\n",proyection1);
-    
-    if(proyection1 < near_plane || proyection1 > far_plane){
-        return false;
-    }
-    
-    float proyection2 = dotProd(v, y);
-    
-    //printf("proyection2 = %f\n",proyection2);
-    
-    float height = near_plane * tang;
-    
-    if(proyection2 < -(height/2) || proyection2 > (height/2)){
-        return false;
-    }
-    
-    float proyection3 = dotProd(v, x);
-    
-    //printf("proyection3 = %f\n",proyection3);
-    
-    float width = height / tang;
-    
-    if(proyection3 < -(width/2) || proyection3 > (width/2)){
-        return false;
-    }
-    
-    return true;
-}
- */
 
+float distanceToPlane(const vector3f &planeNormal, const float planeDistance, const vector3f &point){
+    return (planeNormal.x*point.x + planeNormal.y*point.y + planeNormal.z*point.z) + planeDistance;
+}
+
+bool Camera::pointInFrustrum(float* p) {
+    vector3f point = {p[0],p[1],p[2]};
+    
+    float coords[24];
+    
+    getWorldFrustumCoords(coords);
+    
+    
+    vector3f nbr = {coords[0],  coords[1],  coords[2]}; //nbr
+    vector3f nbl = {coords[3],  coords[4],  coords[5]}; //nbl
+    vector3f ntl = {coords[9],  coords[10], coords[11]};//ntl
+    vector3f ntr = {coords[6],  coords[7],  coords[8]}; //ntr
+    vector3f fbl = {coords[15], coords[16], coords[17]}; //fbl
+    vector3f fbr = {coords[12], coords[13], coords[14]}; //fbr
+    vector3f ftr = {coords[18], coords[19], coords[20]}; //ftr
+    vector3f ftl = {coords[21], coords[22], coords[23]}; //ftl
+    
+    // Getting frustrum planes
+    
+    vector3f front, right, back, left, top, bottom, vector1, vector2, crossFront, crossRight, crossBack, crossLeft, crossTop, crossBottom;
+    float dFront, dRight, dBack, dLeft, dTop, dBottom;
+    
+    // Front
+    vector1.x = ntl.x - nbl.x;
+    vector1.y = ntl.y - nbl.y;
+    vector1.z = ntl.z - nbl.z;
+    
+    vector2.x = nbr.x - nbl.x;
+    vector2.y = nbr.y - nbl.y;
+    vector2.z = nbr.z - nbl.z;
+    
+    crossFront = crossProd(vector1, vector2);
+    
+    dFront = -1 * (nbl.x*crossFront.x + nbl.y*crossFront.y + nbl.z*crossFront.z);
+    
+    // Back
+    
+    vector1.x = ftr.x - fbr.x;
+    vector1.y = ftr.y - fbr.y;
+    vector1.z = ftr.z - fbr.z;
+    
+    vector2.x = fbl.x - fbr.x;
+    vector2.y = fbl.y - fbr.y;
+    vector2.z = fbl.z - fbr.z;
+    
+    crossBack = crossProd(vector1, vector2);
+    
+    dBack = -1 * (fbr.x*crossBack.x + fbr.y*crossBack.y + fbr.z*crossBack.z);
+    
+    // Right
+    
+    vector1.x = ntr.x - nbr.x;
+    vector1.y = ntr.y - nbr.y;
+    vector1.z = ntr.z - nbr.z;
+    
+    vector2.x = fbr.x - nbr.x;
+    vector2.y = fbr.y - nbr.y;
+    vector2.z = fbr.z - nbr.z;
+    
+    crossRight = crossProd(vector1, vector2);
+    
+    dRight = -1 * (nbr.x*crossRight.x + nbr.y*crossRight.y + nbr.z*crossRight.z);
+    
+    // Left
+    
+    vector1.x = fbl.x - nbl.x;
+    vector1.y = fbl.y - nbl.y;
+    vector1.z = fbl.z - nbl.z;
+    
+    vector2.x = ntl.x - nbl.x;
+    vector2.y = ntl.y - nbl.y;
+    vector2.z = ntl.z - nbl.z;
+    
+    crossLeft = crossProd(vector1, vector2);
+    
+    dLeft = -1 * (nbl.x*crossLeft.x + nbl.y*crossLeft.y + nbl.z*crossLeft.z);
+    
+    // Top
+    
+    vector1.x = ftl.x - ntl.x;
+    vector1.y = ftl.y - ntl.y;
+    vector1.z = ftl.z - ntl.z;
+    
+    vector2.x = ntr.x - ntl.x;
+    vector2.y = ntr.y - ntl.y;
+    vector2.z = ntr.z - ntl.z;
+    
+    crossTop = crossProd(vector1, vector2);
+    
+    dTop = -1 * (ntl.x*crossTop.x + ntl.y*crossTop.y + ntl.z*crossTop.z);
+    
+    // Bottom
+    
+    vector1.x = nbr.x - nbl.x;
+    vector1.y = nbr.y - nbl.y;
+    vector1.z = nbr.z - nbl.z;
+    
+    vector2.x = fbl.x - nbl.x;
+    vector2.y = fbl.y - nbl.y;
+    vector2.z = fbl.z - nbl.z;
+    
+    crossBottom = crossProd(vector1, vector2);
+    
+    dBottom = -1 * (nbl.x*crossBottom.x + nbl.y*crossBottom.y + nbl.z*crossBottom.z);
+    
+    float distanceFront, distanceRight, distanceBack, distanceLeft, distanceTop, distanceBottom;
+    
+    distanceFront = distanceToPlane(crossFront, dFront, point);
+    distanceRight = distanceToPlane(crossRight, dRight, point);
+    distanceBack = distanceToPlane(crossBack, dBack, point);
+    distanceLeft = distanceToPlane(crossLeft, dLeft, point);
+    distanceTop = distanceToPlane(crossTop, dTop, point);
+    distanceBottom = distanceToPlane(crossBottom, dBottom, point);
+    
+    if (distanceFront >= 0 && distanceRight >= 0 && distanceBack >= 0 && distanceLeft >= 0 && distanceTop >= 0 && distanceBottom >= 0){
+        return true;
+    }
+    
+    return false;
+}
+ 
+/*
 bool Camera::pointInFrustrum(float* p) {
     int viewportDims[4];
         
@@ -533,3 +604,4 @@ bool Camera::pointInFrustrum(float* p) {
     return true;
 }
 
+*/
